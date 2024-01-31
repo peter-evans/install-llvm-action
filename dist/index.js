@@ -78,6 +78,7 @@ function getOptions() {
         directory: $iL6dd.getInput("directory"),
         cached: ($iL6dd.getInput("cached") || "").toLowerCase() === "true",
         downloadUrl: $iL6dd.getInput("download-url"),
+        arch: $iL6dd.getInput("arch"),
         auth: $iL6dd.getInput("auth"),
         env: ($iL6dd.getInput("env") ?? "").toLowerCase() === "true"
     };
@@ -219,13 +220,14 @@ function getOptions() {
     "17.0.2"
 ]);
 /** The Darwin version suffixes which are applied for some releases. */ const DARWIN_VERSIONS = {
-    "15.0.7": "21.0"
+    "15.0.7-x86_64": "21.0",
+    "15.0.7-arm64": "22.0"
 };
 /** Gets an LLVM download URL for the Darwin platform. */ function getDarwinUrl(version, options) {
     if (!options.forceVersion && DARWIN_MISSING.has(version)) return null;
     const darwin = version === "9.0.0" ? "-darwin-apple" : "-apple-darwin";
     const prefix = "clang+llvm-";
-    const suffix = `-x86_64${darwin}${DARWIN_VERSIONS[version] ?? ""}.tar.xz`;
+    const suffix = `-${options.arch ?? "x86_64"}${darwin}${DARWIN_VERSIONS[`${version}-${options.arch}`] ?? ""}.tar.xz`;
     if (options.downloadUrl) return getDownloadUrl(options.downloadUrl, version, prefix, suffix);
     else if (compareVersions(version, "9.0.1") >= 0) return getGitHubUrl(version, prefix, suffix);
     else return getReleaseUrl(version, prefix, suffix);
@@ -307,7 +309,7 @@ function getOptions() {
     else ubuntu = UBUNTU[version];
     if (!ubuntu) return null;
     const prefix = "clang+llvm-";
-    const suffix = `-x86_64-linux-gnu${ubuntu}.tar.xz`;
+    const suffix = `-${options.arch ?? "x86_64"}-linux-gnu${ubuntu}.tar.xz`;
     if (options.downloadUrl) return getDownloadUrl(options.downloadUrl, version, prefix, suffix);
     else if (compareVersions(version, "9.0.1") >= 0) return getGitHubUrl(version, prefix, suffix);
     else return getReleaseUrl(version, prefix, suffix);
@@ -1048,6 +1050,7 @@ $parcel$export(module.exports, "default", () => $0b832682bf3fc1e7$export$2e2bcd8
 var $0b832682bf3fc1e7$export$2e2bcd8739ae039 = /^(?:[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|00000000-0000-0000-0000-000000000000)$/i;
 
 });
+
 
 
 

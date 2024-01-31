@@ -31,6 +31,7 @@ async function main() {
 Expected at least two arguments:
   1. <platform>
   2. <version>
+  3. <arch>
   3. --forceVersion=<forceVersion> (optional)
   4. --ubuntuVersion=<ubuntuVersion> (optional)`)
     process.exit(1);
@@ -41,13 +42,14 @@ Expected at least two arguments:
 
     const options: Options = {
       version: process.argv[start + 2],
+      arch: process.argv[start + 3],
       directory: "",
       forceVersion: false,
       cached: false,
       env: false,
     };
 
-    for (const argument of process.argv.slice(start + 3)) {
+    for (const argument of process.argv.slice(start + 4)) {
       const [name, value] = argument.split("=");
       switch (name) {
         case "--forceVersion":

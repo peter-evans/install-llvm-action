@@ -11,6 +11,7 @@ export interface Options {
   ubuntuVersion?: string,
   cached: boolean,
   downloadUrl?: string,
+  arch?: string,
   auth?: string,
   env: boolean,
 }
@@ -23,6 +24,7 @@ function getOptions(): Options {
     directory: core.getInput("directory"),
     cached: (core.getInput("cached") || "").toLowerCase() === "true",
     downloadUrl: core.getInput("download-url"),
+    arch: core.getInput("arch"),
     auth: core.getInput("auth"),
     env: (core.getInput("env") ?? "").toLowerCase() === "true",
   };
@@ -155,7 +157,8 @@ const DARWIN_MISSING: Set<string> = new Set([
 
 /** The Darwin version suffixes which are applied for some releases. */
 const DARWIN_VERSIONS: { [key: string]: string } = {
-  "15.0.7": "21.0",
+  "15.0.7-x86_64": "21.0",
+  "15.0.7-arm64": "22.0",
 };
 
 /** Gets an LLVM download URL for the Darwin platform. */
@@ -166,7 +169,7 @@ function getDarwinUrl(version: string, options: Options): string | null {
 
   const darwin = version === "9.0.0" ? "-darwin-apple" : "-apple-darwin";
   const prefix = "clang+llvm-";
-  const suffix = `-x86_64${darwin}${DARWIN_VERSIONS[version] ?? ""}.tar.xz`;
+  const suffix = `-${options.arch ?? "x86_64"}${darwin}${DARWIN_VERSIONS[`${version}-${options.arch}`] ?? ""}.tar.xz`;
   if (options.downloadUrl) {
     return getDownloadUrl(options.downloadUrl, version, prefix, suffix);
   } else if (compareVersions(version, "9.0.1") >= 0) {
@@ -276,7 +279,7 @@ function getLinuxUrl(version: string, options: Options): string | null {
   }
 
   const prefix = "clang+llvm-";
-  const suffix = `-x86_64-linux-gnu${ubuntu}.tar.xz`;
+  const suffix = `-${options.arch ?? "x86_64"}-linux-gnu${ubuntu}.tar.xz`;
   if (options.downloadUrl) {
     return getDownloadUrl(options.downloadUrl, version, prefix, suffix);
   } else if (compareVersions(version, "9.0.1") >= 0) {
